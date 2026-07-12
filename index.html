@@ -1,88 +1,756 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
-
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>The Cheesecake Studio</title>
-
-<link rel="stylesheet" href="css/style.css">
-
+<title>The Cheesecake Lab — Design Your Own Cheesecake</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&family=DM+Sans:ital,wght@0,400;0,500;0,700;1,400&family=Cormorant+Garamond:ital,wght@0,500;1,500&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --cream:#F8F5F2;
+    --warm-white:#FFFDFB;
+    --beige:#ECE0D2;
+    --choc:#3B2A20;
+    --choc-soft:#5B4636;
+    --caramel:#C9975B;
+    --gold:#B98A45;
+    --burgundy:#7C2E3A;
+    --burgundy-soft:#9c4353;
+    --line: rgba(59,42,32,0.12);
+    --shadow: 0 20px 50px -20px rgba(59,42,32,0.25);
+    --radius: 22px;
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{
+    margin:0;
+    background:var(--cream);
+    color:var(--choc);
+    font-family:'DM Sans', sans-serif;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+  h1,h2,h3, .serif{
+    font-family:'Playfair Display', serif;
+    margin:0;
+    font-weight:600;
+    letter-spacing:-0.01em;
+  }
+  .script{
+    font-family:'Cormorant Garamond', serif;
+    font-style:italic;
+    color:var(--burgundy);
+  }
+  p{line-height:1.65; color:var(--choc-soft);}
+  a{color:inherit;}
+  img{max-width:100%;display:block;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  .eyebrow{
+    text-transform:uppercase;
+    letter-spacing:0.22em;
+    font-size:12px;
+    color:var(--gold);
+    font-weight:700;
+    margin-bottom:14px;
+    display:flex;align-items:center;gap:10px;
+  }
+  .eyebrow::before{content:"";width:26px;height:1px;background:var(--gold);}
+  .btn{
+    display:inline-flex;align-items:center;gap:10px;
+    padding:16px 34px;
+    background:var(--choc);
+    color:var(--warm-white);
+    border:none;
+    border-radius:100px;
+    font-family:'DM Sans',sans-serif;
+    font-weight:700;
+    font-size:15px;
+    letter-spacing:0.02em;
+    cursor:pointer;
+    transition:transform .35s cubic-bezier(.2,.8,.2,1), box-shadow .35s ease, background .3s ease;
+    box-shadow:0 12px 26px -12px rgba(59,42,32,0.5);
+  }
+  .btn:hover{transform:translateY(-3px); background:var(--burgundy);}
+  .btn.ghost{
+    background:transparent;
+    color:var(--choc);
+    border:1.5px solid var(--choc);
+    box-shadow:none;
+  }
+  .btn.ghost:hover{background:var(--choc); color:var(--warm-white);}
 
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  /* NAV */
+  nav{
+    position:sticky; top:0; z-index:50;
+    background:rgba(248,245,242,0.82);
+    backdrop-filter:blur(14px);
+    border-bottom:1px solid var(--line);
+  }
+  nav .wrap{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 28px;
+  }
+  .logo{
+    display:flex;align-items:baseline;gap:6px;
+    font-size:20px;
+  }
+  .logo b{font-weight:700;}
+  .navlinks{display:flex;gap:34px;font-size:14px;font-weight:500;}
+  .navlinks a{text-decoration:none;opacity:0.75;transition:opacity .2s;}
+  .navlinks a:hover{opacity:1;}
+  .navcta{display:flex;align-items:center;gap:18px;}
+  @media(max-width:860px){.navlinks{display:none;}}
 
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  /* HERO */
+  .hero{
+    position:relative;
+    padding:90px 0 70px;
+    overflow:hidden;
+  }
+  .hero .wrap{
+    display:grid;grid-template-columns:1.05fr 0.95fr;gap:40px;align-items:center;
+  }
+  .hero-copy h1{
+    font-size:clamp(40px,5.4vw,68px);
+    line-height:1.04;
+  }
+  .hero-copy h1 em{
+    font-style:italic;
+    color:var(--burgundy);
+    font-weight:500;
+  }
+  .hero-copy p.lead{
+    font-size:18px;max-width:440px;margin:22px 0 34px;
+  }
+  .hero-actions{display:flex;gap:16px;flex-wrap:wrap;align-items:center;}
+  .hero-stats{display:flex;gap:34px;margin-top:44px;}
+  .hero-stats div{font-family:'Playfair Display',serif;font-size:26px;}
+  .hero-stats span{display:block;font-family:'DM Sans',sans-serif;font-size:12px;color:var(--choc-soft);text-transform:uppercase;letter-spacing:0.12em;margin-top:4px;}
 
+  .hero-visual{position:relative;display:flex;justify-content:center;align-items:center;}
+  .hero-blob{
+    position:absolute;width:420px;height:420px;border-radius:50%;
+    background:radial-gradient(circle at 35% 30%, #f0e2cf, transparent 70%);
+    filter:blur(6px);
+  }
+  .float-jar{animation:floaty 6s ease-in-out infinite;}
+  @keyframes floaty{0%,100%{transform:translateY(0px) rotate(-1.2deg);}50%{transform:translateY(-16px) rotate(1.2deg);}}
+
+  section{padding:110px 0;}
+  .section-head{max-width:640px;margin-bottom:56px;}
+  .section-head.center{margin-left:auto;margin-right:auto;text-align:center;}
+  .section-head h2{font-size:clamp(30px,3.6vw,44px);}
+
+  /* HOW IT WORKS */
+  .steps-row{
+    display:grid;grid-template-columns:repeat(6,1fr);gap:0;position:relative;
+  }
+  .steps-row::before{
+    content:"";position:absolute;top:26px;left:6%;right:6%;height:1px;
+    background:repeating-linear-gradient(to right, var(--gold) 0 6px, transparent 6px 12px);
+  }
+  .step{position:relative;text-align:center;padding:0 10px;}
+  .step .num{
+    width:52px;height:52px;border-radius:50%;
+    background:var(--warm-white); border:1.5px solid var(--gold);
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Playfair Display',serif; font-size:18px;
+    margin:0 auto 18px; position:relative;z-index:2;
+    color:var(--burgundy);
+  }
+  .step h3{font-size:16px;font-weight:700;font-family:'DM Sans',sans-serif;margin-bottom:8px;}
+  .step p{font-size:13.5px;}
+  @media(max-width:900px){
+    .steps-row{grid-template-columns:repeat(3,1fr);row-gap:44px;}
+    .steps-row::before{display:none;}
+  }
+
+  /* FEATURED */
+  .creation-scroll{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:26px;
+  }
+  @media(max-width:900px){.creation-scroll{grid-template-columns:1fr;}}
+  .creation-card{
+    background:var(--warm-white);
+    border-radius:var(--radius);
+    padding:30px;
+    box-shadow:var(--shadow);
+    border:1px solid var(--line);
+    transition:transform .4s cubic-bezier(.2,.8,.2,1);
+  }
+  .creation-card:hover{transform:translateY(-8px);}
+  .jar-mini{width:100%;height:170px;display:flex;align-items:center;justify-content:center;margin-bottom:22px;}
+  .creation-card h3{font-size:19px;margin-bottom:6px;}
+  .creation-card .tagname{color:var(--burgundy); font-family:'Cormorant Garamond',serif; font-style:italic; font-size:19px;}
+  .creation-card .combo{font-size:13px;color:var(--choc-soft);margin-top:10px;}
+
+  /* WHY */
+  .why-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:2px;background:var(--line);border-radius:var(--radius);overflow:hidden;}
+  .why-item{background:var(--warm-white);padding:38px 30px;}
+  .why-item .ic{font-size:26px;margin-bottom:16px;}
+  .why-item h3{font-size:17px;margin-bottom:8px;}
+  .why-item p{font-size:13.5px;}
+  @media(max-width:900px){.why-grid{grid-template-columns:1fr;}}
+
+  /* BUILDER */
+  #builder{
+    background:var(--choc);
+    color:var(--warm-white);
+    border-radius:44px;
+    margin:0 20px;
+    padding:80px 0 90px;
+  }
+  #builder .section-head p{color:rgba(255,253,251,0.65);}
+  #builder .section-head h2{color:var(--warm-white);}
+  .builder-grid{
+    display:grid;grid-template-columns:1fr 420px;gap:50px;align-items:start;
+  }
+  @media(max-width:980px){.builder-grid{grid-template-columns:1fr;}}
+
+  .tabbar{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:34px;}
+  .tab{
+    padding:10px 18px;border-radius:100px;
+    border:1px solid rgba(255,253,251,0.25);
+    background:transparent;color:rgba(255,253,251,0.6);
+    font-family:'DM Sans',sans-serif;font-size:13px;font-weight:600;
+    cursor:pointer;transition:.25s;white-space:nowrap;
+  }
+  .tab.active{background:var(--gold);color:var(--choc);border-color:var(--gold);}
+  .tab .n{opacity:0.6;margin-right:6px;}
+
+  .panel{display:none;}
+  .panel.active{display:block;animation:fadein .4s ease;}
+  @keyframes fadein{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:translateY(0);}}
+  .panel h4{font-family:'Playfair Display',serif;font-size:24px;margin-bottom:8px;font-weight:600;}
+  .panel .sub{color:rgba(255,253,251,0.55);font-size:14px;margin-bottom:26px;}
+
+  .opt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:14px;}
+  .opt-card{
+    background:rgba(255,253,251,0.05);
+    border:1px solid rgba(255,253,251,0.15);
+    border-radius:16px;
+    padding:18px 16px;
+    cursor:pointer;
+    transition:transform .3s cubic-bezier(.2,.8,.2,1), background .25s, border-color .25s;
+    position:relative;
+  }
+  .opt-card:hover{transform:translateY(-4px);background:rgba(255,253,251,0.09);}
+  .opt-card.sel{border-color:var(--gold);background:rgba(201,151,91,0.16);}
+  .opt-card .swatch{width:30px;height:30px;border-radius:50%;margin-bottom:12px;box-shadow:inset 0 0 0 1px rgba(0,0,0,0.15);}
+  .opt-card h5{margin:0 0 4px;font-size:14.5px;font-weight:700;font-family:'DM Sans',sans-serif;}
+  .opt-card .price-tag{font-size:11.5px;color:var(--gold);}
+  .opt-card.multi.sel::after{
+    content:"✓";position:absolute;top:12px;right:14px;color:var(--gold);font-weight:700;
+  }
+
+  .name-input-wrap{margin-top:8px;}
+  .name-input-wrap input{
+    width:100%;padding:16px 18px;border-radius:14px;
+    background:rgba(255,253,251,0.06);
+    border:1px solid rgba(255,253,251,0.2);
+    color:var(--warm-white);font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;
+    outline:none;
+  }
+  .name-input-wrap input::placeholder{color:rgba(255,253,251,0.4);}
+  .name-examples{display:flex;gap:10px;flex-wrap:wrap;margin-top:14px;}
+  .name-examples span{
+    font-size:12px;padding:7px 12px;border-radius:100px;border:1px solid rgba(255,253,251,0.2);
+    cursor:pointer;color:rgba(255,253,251,0.6);
+  }
+  .name-examples span:hover{border-color:var(--gold);color:var(--gold);}
+
+  .panel-nav{display:flex;justify-content:space-between;margin-top:38px;}
+  .panel-nav button{
+    background:transparent;border:1px solid rgba(255,253,251,0.3);color:var(--warm-white);
+    padding:13px 26px;border-radius:100px;font-weight:600;cursor:pointer;font-family:'DM Sans',sans-serif;
+  }
+  .panel-nav button.primary{background:var(--gold);color:var(--choc);border-color:var(--gold);}
+  .panel-nav button:disabled{opacity:0.3;cursor:default;}
+
+  /* LIVE PREVIEW CARD */
+  .preview-card{
+    position:sticky; top:100px;
+    background:rgba(255,253,251,0.06);
+    border:1px solid rgba(255,253,251,0.15);
+    border-radius:26px;
+    padding:30px;
+  }
+  .jar-stage{display:flex;justify-content:center;padding:10px 0 22px;}
+  .price-line{display:flex;align-items:baseline;justify-content:space-between;margin-bottom:18px;padding-bottom:18px;border-bottom:1px dashed rgba(255,253,251,0.2);}
+  .price-line .amt{font-family:'Playfair Display',serif;font-size:32px;}
+  .summary-row{display:flex;justify-content:space-between;font-size:13.5px;padding:9px 0;border-bottom:1px solid rgba(255,253,251,0.08);color:rgba(255,253,251,0.75);}
+  .summary-row b{color:var(--warm-white);font-weight:600;}
+  .summary-name{
+    margin-top:16px;font-family:'Cormorant Garamond',serif;font-style:italic;font-size:20px;color:var(--gold);
+    min-height:26px;
+  }
+  .checkout-btn{
+    width:100%;margin-top:22px;justify-content:center;
+    background:var(--gold);color:var(--choc);box-shadow:none;
+  }
+  .checkout-btn:hover{background:var(--warm-white);}
+  .delivery-note{font-size:12px;color:rgba(255,253,251,0.5);text-align:center;margin-top:12px;}
+
+  /* FOOTER */
+  footer{padding:70px 0 40px;text-align:center;}
+  footer .logo{justify-content:center;margin-bottom:14px;}
+  footer p{max-width:420px;margin:0 auto 26px;font-size:14px;}
+  .footer-links{display:flex;justify-content:center;gap:26px;font-size:13px;margin-bottom:34px;}
+  .footer-links a{text-decoration:none;opacity:0.7;}
+  .fine{font-size:12px;color:var(--choc-soft);opacity:0.6;}
+
+  @media (max-width:700px){
+    section{padding:70px 0;}
+    #builder{border-radius:26px;margin:0 10px;padding:56px 0 60px;}
+    .hero{padding:56px 0 40px;}
+    .hero .wrap{grid-template-columns:1fr;}
+    .hero-visual{order:-1;margin-bottom:10px;}
+  }
+  @media (prefers-reduced-motion: reduce){
+    .float-jar{animation:none;}
+    *{transition-duration:0.01ms !important; animation-duration:0.01ms !important;}
+  }
+</style>
 </head>
-
 <body>
 
 <nav>
-
-<div class="logo">
-
-The Cheesecake Studio
-
-</div>
-
-<ul>
-
-<li><a href="#">Home</a></li>
-
-<li><a href="#">Menu</a></li>
-
-<li><a href="#">Build Yours</a></li>
-
-<li><a href="#">About</a></li>
-
-<li><a href="#">Contact</a></li>
-
-</ul>
-
+  <div class="wrap">
+    <div class="logo"><b>The Cheesecake</b>&nbsp;<span class="script">Lab</span></div>
+    <div class="navlinks">
+      <a href="#how">How it works</a>
+      <a href="#creations">Creations</a>
+      <a href="#why">Why us</a>
+    </div>
+    <div class="navcta">
+      <a href="#builder" class="btn ghost" style="padding:11px 24px;font-size:13px;">Start Building</a>
+    </div>
+  </div>
 </nav>
 
-<header class="hero">
+<section class="hero">
+  <div class="wrap">
+    <div class="hero-copy">
+      <div class="eyebrow">Bengaluru · Made to order · 24hrs notice</div>
+      <h1>Build your<br><em>own</em> cheesecake.</h1>
+      <p class="lead">Every jar is handcrafted after you design it — crust, base, swirl, toppings, drizzle, even the name on the label. No menu. Just yours.</p>
+      <div class="hero-actions">
+        <a href="#builder" class="btn">Start Building →</a>
+        <a href="#how" class="btn ghost">See how it works</a>
+      </div>
+      <div class="hero-stats">
+        <div>6<span>steps to design</span></div>
+        <div>0<span>preservatives</span></div>
+        <div>1<span>made just for you</span></div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <div class="hero-blob"></div>
+      <div class="float-jar" id="heroJarMount"></div>
+    </div>
+  </div>
+</section>
 
-<div class="overlay"></div>
+<section id="how">
+  <div class="wrap">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center;">The process</div>
+      <h2>From idea to jar, in six choices.</h2>
+    </div>
+    <div class="steps-row">
+      <div class="step"><div class="num">1</div><h3>Choose</h3><p>Size, crust &amp; base</p></div>
+      <div class="step"><div class="num">2</div><h3>Customize</h3><p>Swirl, toppings, drizzle</p></div>
+      <div class="step"><div class="num">3</div><h3>Name it</h3><p>Your creation, your title</p></div>
+      <div class="step"><div class="num">4</div><h3>We make it</h3><p>Handcrafted, no-bake</p></div>
+      <div class="step"><div class="num">5</div><h3>We chill it</h3><p>Set fresh, never frozen</p></div>
+      <div class="step"><div class="num">6</div><h3>Delivered</h3><p>Straight to your door</p></div>
+    </div>
+  </div>
+</section>
 
-<div class="hero-content">
+<section id="creations">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Featured creations</div>
+      <h2>Not a menu.<br>A gallery of what others designed.</h2>
+    </div>
+    <div class="creation-scroll" id="creationsGrid"></div>
+  </div>
+</section>
 
-<h1>Craft Your Perfect Cheesecake</h1>
+<section id="why">
+  <div class="wrap">
+    <div class="section-head center">
+      <div class="eyebrow" style="justify-content:center;">Why the lab</div>
+      <h2>Small batch, by design.</h2>
+    </div>
+    <div class="why-grid">
+      <div class="why-item"><div class="ic">🧊</div><h3>No-bake, always fresh</h3><p>Set in the fridge, never in an oven. Made within a day of your delivery.</p></div>
+      <div class="why-item"><div class="ic">🎛️</div><h3>Fully custom</h3><p>Every layer is a decision you make — nothing pre-set, nothing generic.</p></div>
+      <div class="why-item"><div class="ic">🏡</div><h3>Home kitchen</h3><p>Small batches, made by hand, from a home kitchen in Bengaluru.</p></div>
+      <div class="why-item"><div class="ic">🥇</div><h3>Premium ingredients</h3><p>Belgian chocolate, real fruit, Biscoff, no shortcuts.</p></div>
+      <div class="why-item"><div class="ic">📦</div><h3>Made to order</h3><p>Pre-orders only, at least 24 hours ahead — so every jar is made for you.</p></div>
+      <div class="why-item"><div class="ic">🎁</div><h3>Gifting-ready</h3><p>Birthdays, corporate gifting, or just because — named and packaged beautifully.</p></div>
+    </div>
+  </div>
+</section>
 
-<p>
+<section id="builder">
+  <div class="wrap">
+    <div class="section-head">
+      <div class="eyebrow">Build your cheesecake</div>
+      <h2>Design your creation.</h2>
+      <p>Pick as you go — the jar and the price update as you build.</p>
+    </div>
 
-Freshly handcrafted. Premium ingredients.
+    <div class="tabbar" id="tabbar"></div>
 
-Made only after you order.
+    <div class="builder-grid">
+      <div class="panels" id="panels"></div>
 
-</p>
+      <div class="preview-card">
+        <div class="jar-stage" id="jarMount"></div>
+        <div class="price-line">
+          <span style="color:rgba(255,253,251,0.6);font-size:13px;">Estimated price</span>
+          <span class="amt" id="priceAmt">₹499</span>
+        </div>
+        <div class="summary-row"><span>Size</span><b id="sumSize">Regular</b></div>
+        <div class="summary-row"><span>Crust</span><b id="sumCrust">Digestive</b></div>
+        <div class="summary-row"><span>Base</span><b id="sumBase">Vanilla</b></div>
+        <div class="summary-row"><span>Swirl</span><b id="sumSwirl">—</b></div>
+        <div class="summary-row"><span>Toppings</span><b id="sumToppings">—</b></div>
+        <div class="summary-row"><span>Drizzle</span><b id="sumDrizzle">—</b></div>
+        <div class="summary-row" style="border-bottom:none;"><span>Delivery</span><b id="sumDelivery">Tomorrow +</b></div>
+        <div class="summary-name" id="sumName">"Name your creation"</div>
+        <a class="btn checkout-btn" id="checkoutBtn" target="_blank">Proceed to Checkout →</a>
+        <div class="delivery-note">Orders confirmed via WhatsApp · 24hr minimum notice</div>
+      </div>
+    </div>
+  </div>
+</section>
 
-<div class="buttons">
+<footer>
+  <div class="wrap">
+    <div class="logo"><b>The Cheesecake</b>&nbsp;<span class="script">Lab</span></div>
+    <p>Design it. We make it. You love it. A home-based, made-to-order cheesecake studio in Bengaluru.</p>
+    <div class="footer-links">
+      <a href="#builder">Start building</a>
+      <a href="#creations">Creations</a>
+      <a href="https://wa.me/" target="_blank">WhatsApp us</a>
+      <a href="#">Instagram</a>
+    </div>
+    <div class="fine">© 2026 The Cheesecake Lab · Home kitchen, Bengaluru · Pre-orders only</div>
+  </div>
+</footer>
 
-<a href="#" class="primary-btn">
+<script>
+/* ---------------- DATA ---------------- */
+const DATA = {
+  size:   [{k:'mini',n:'Mini',price:249},{k:'regular',n:'Regular (250g)',price:499},{k:'sharing',n:'Sharing',price:899}],
+  crust:  [{k:'digestive',n:'Digestive',price:0,color:'#C9975B'},{k:'oreo',n:'Oreo',price:20,color:'#2b211d'},{k:'biscoff',n:'Biscoff',price:30,color:'#a9723a'}],
+  base:   [{k:'vanilla',n:'Vanilla',price:0,color:'#F3E6D3'},{k:'belgian',n:'Belgian Chocolate',price:60,color:'#5a3826'},{k:'coffee',n:'Coffee',price:40,color:'#8a5a3c'}],
+  swirl:  [{k:'chocolate',n:'Chocolate',price:0,color:'#4a2c1c'},{k:'caramel',n:'Salted Caramel',price:0,color:'#c98a3c'},{k:'strawberry',n:'Strawberry',price:0,color:'#c23b52'},{k:'blueberry',n:'Blueberry',price:0,color:'#4d3b7a'},{k:'peanut',n:'Peanut Butter',price:20,color:'#a9702f'},{k:'biscoff',n:'Biscoff',price:20,color:'#a9723a'}],
+  topping:[{k:'oreocrumb',n:'Oreo Crumble',price:0,color:'#2b211d'},{k:'biscoffcrumb',n:'Biscoff Crumble',price:0,color:'#a9723a'},{k:'chocochip',n:'Chocolate Chips',price:0,color:'#3a2416'},{k:'dryfruit',n:'Dry Fruits',price:30,color:'#c79a56'},{k:'kitkat',n:'KitKat',price:30,color:'#8c1c1c'},{k:'gems',n:'Gems',price:20,color:'#d9455c'},{k:'sprinkles',n:'Sprinkles',price:10,color:'#e0a8c2'}],
+  drizzle:[{k:'none',n:'None',price:0,color:'transparent'},{k:'chocolate',n:'Chocolate',price:0,color:'#3a2416'},{k:'caramel',n:'Caramel',price:0,color:'#c98a3c'},{k:'berry',n:'Berry',price:20,color:'#7c2e3a'},{k:'biscoff',n:'Biscoff',price:20,color:'#a9723a'}]
+};
 
-Build Yours
+const state = {
+  size:'regular', crust:'digestive', base:'vanilla', swirl:'chocolate',
+  toppings:['oreocrumb'], drizzle:'chocolate', name:''
+};
 
-</a>
+const STEPS = [
+  {key:'size', label:'Size', title:'Choose your size', sub:'How much cheesecake does this occasion need?', multi:false},
+  {key:'crust', label:'Crust', title:'Choose your crust', sub:'The base layer of every good jar.', multi:false},
+  {key:'base', label:'Base', title:'Choose your cheesecake base', sub:'The heart of the creation.', multi:false},
+  {key:'swirl', label:'Swirl', title:'Choose your swirl', sub:'Folded through the base, layer by layer.', multi:false},
+  {key:'topping', label:'Toppings', title:'Choose your toppings', sub:'Pick as many as you like — first two are included.', multi:true},
+  {key:'drizzle', label:'Drizzle', title:'Choose your drizzle', sub:'The finishing pour on top.', multi:false},
+  {key:'name', label:'Name it', title:'Name your creation', sub:'This appears on the packaging label.', multi:false}
+];
 
-<a href="#" class="secondary-btn">
+let currentStep = 0;
 
-View Menu
+/* ---------------- JAR SVG ---------------- */
+function jarSVG(id, size){
+  return `
+  <svg id="${id}" viewBox="0 0 240 300" width="${size}" height="${size*1.25}" xmlns="http://www.w3.org/2000/svg">
+    <defs>
+      <clipPath id="jarClip-${id}">
+        <path d="M62 90 L58 260 Q58 278 80 278 L160 278 Q182 278 182 260 L178 90 Z"/>
+      </clipPath>
+      <linearGradient id="glassShine-${id}" x1="0" y1="0" x2="1" y2="0">
+        <stop offset="0" stop-color="#ffffff" stop-opacity="0.35"/>
+        <stop offset="0.3" stop-color="#ffffff" stop-opacity="0"/>
+      </linearGradient>
+    </defs>
+    <!-- jar body outline -->
+    <path d="M62 90 L58 260 Q58 278 80 278 L160 278 Q182 278 182 260 L178 90 Z" fill="#fdf9f3" stroke="#3B2A20" stroke-width="2.5"/>
+    <!-- filling layers, clipped -->
+    <g clip-path="url(#jarClip-${id})">
+      <rect id="layer-crust-${id}" x="55" y="235" width="130" height="45" fill="#C9975B"/>
+      <rect id="layer-base-${id}" x="55" y="150" width="130" height="90" fill="#F3E6D3"/>
+      <path id="layer-swirl-${id}" d="M55 150 Q90 135 120 150 T185 150 L185 175 Q150 190 120 175 T55 178 Z" fill="#4a2c1c"/>
+      <g id="layer-toppings-${id}"></g>
+      <g id="layer-drizzle-${id}"></g>
+    </g>
+    <!-- glass rim + shine -->
+    <ellipse cx="120" cy="90" rx="58" ry="10" fill="none" stroke="#3B2A20" stroke-width="2.5"/>
+    <path d="M62 90 L58 260 Q58 278 80 278 L160 278 Q182 278 182 260 L178 90 Z" fill="url(#glassShine-${id})"/>
+    <ellipse cx="120" cy="90" rx="58" ry="10" fill="#fff" opacity="0.15"/>
+  </svg>`;
+}
 
-</a>
+document.getElementById('heroJarMount').innerHTML = jarSVG('heroJar', 300);
+document.getElementById('jarMount').innerHTML = jarSVG('mainJar', 220);
 
-</div>
+function toppingPositions(n){
+  const spots = [[85,158],[105,148],[125,155],[145,148],[160,160],[95,168],[135,168],[115,140]];
+  return spots.slice(0, Math.min(n, spots.length));
+}
 
-</div>
+function renderJar(id){
+  const crust = DATA.crust.find(c=>c.k===state.crust);
+  const base = DATA.base.find(b=>b.k===state.base);
+  const swirl = DATA.swirl.find(s=>s.k===state.swirl);
+  const drizzle = DATA.drizzle.find(d=>d.k===state.drizzle);
 
-</header>
+  document.getElementById(`layer-crust-${id}`).setAttribute('fill', crust.color);
+  document.getElementById(`layer-base-${id}`).setAttribute('fill', base.color);
+  document.getElementById(`layer-swirl-${id}`).setAttribute('fill', swirl.color);
+  document.getElementById(`layer-swirl-${id}`).setAttribute('opacity', '0.85');
 
-<script src="js/script.js"></script>
+  const topG = document.getElementById(`layer-toppings-${id}`);
+  topG.innerHTML = '';
+  const pos = toppingPositions(state.toppings.length * 3);
+  let i = 0;
+  state.toppings.forEach(tKey=>{
+    const t = DATA.topping.find(x=>x.k===tKey);
+    for(let j=0;j<3 && i<pos.length;j++,i++){
+      const [x,y] = pos[i];
+      const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+      c.setAttribute('cx', x + (Math.random()*6-3));
+      c.setAttribute('cy', y + (Math.random()*6-3));
+      c.setAttribute('r', 4.5);
+      c.setAttribute('fill', t.color);
+      topG.appendChild(c);
+    }
+  });
 
+  const drizG = document.getElementById(`layer-drizzle-${id}`);
+  drizG.innerHTML = '';
+  if(drizzle.k !== 'none'){
+    const drips = [ 'M75 140 Q73 165 76 190', 'M100 138 Q98 158 101 178', 'M125 140 Q123 170 126 205', 'M150 138 Q148 160 151 185', 'M165 142 Q163 165 166 188' ];
+    drips.forEach(dPath=>{
+      const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+      p.setAttribute('d', dPath);
+      p.setAttribute('stroke', drizzle.color);
+      p.setAttribute('stroke-width', '6');
+      p.setAttribute('stroke-linecap', 'round');
+      p.setAttribute('fill', 'none');
+      drizG.appendChild(p);
+    });
+    const pool = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+    pool.setAttribute('cx','120'); pool.setAttribute('cy','142'); pool.setAttribute('rx','62'); pool.setAttribute('ry','8');
+    pool.setAttribute('fill', drizzle.color);
+    drizG.insertBefore(pool, drizG.firstChild);
+  }
+}
+
+/* ---------------- PRICE + SUMMARY ---------------- */
+function computePrice(){
+  const size = DATA.size.find(s=>s.k===state.size);
+  const crust = DATA.crust.find(c=>c.k===state.crust);
+  const base = DATA.base.find(b=>b.k===state.base);
+  const swirl = DATA.swirl.find(s=>s.k===state.swirl);
+  const drizzle = DATA.drizzle.find(d=>d.k===state.drizzle);
+  let total = size.price + crust.price + base.price + swirl.price + drizzle.price;
+  state.toppings.forEach((tk, idx)=>{
+    const t = DATA.topping.find(x=>x.k===tk);
+    if(idx >= 2) total += t.price + 15; // extra toppings beyond the 2 included
+    else total += t.price;
+  });
+  return total;
+}
+
+function updateSummary(){
+  document.getElementById('priceAmt').textContent = '₹' + computePrice();
+  document.getElementById('sumSize').textContent = DATA.size.find(s=>s.k===state.size).n;
+  document.getElementById('sumCrust').textContent = DATA.crust.find(c=>c.k===state.crust).n;
+  document.getElementById('sumBase').textContent = DATA.base.find(b=>b.k===state.base).n;
+  document.getElementById('sumSwirl').textContent = DATA.swirl.find(s=>s.k===state.swirl).n;
+  document.getElementById('sumToppings').textContent = state.toppings.length
+    ? state.toppings.map(k=>DATA.topping.find(t=>t.k===k).n).join(', ')
+    : '—';
+  document.getElementById('sumDrizzle').textContent = DATA.drizzle.find(d=>d.k===state.drizzle).n;
+  document.getElementById('sumName').textContent = state.name ? `"${state.name}"` : '"Name your creation"';
+
+  const msg = `Hi! I'd like to order a custom cheesecake:%0A` +
+    `Size: ${DATA.size.find(s=>s.k===state.size).n}%0A` +
+    `Crust: ${DATA.crust.find(c=>c.k===state.crust).n}%0A` +
+    `Base: ${DATA.base.find(b=>b.k===state.base).n}%0A` +
+    `Swirl: ${DATA.swirl.find(s=>s.k===state.swirl).n}%0A` +
+    `Toppings: ${state.toppings.map(k=>DATA.topping.find(t=>t.k===k).n).join(', ') || 'None'}%0A` +
+    `Drizzle: ${DATA.drizzle.find(d=>d.k===state.drizzle).n}%0A` +
+    `Name: "${state.name || 'Untitled'}"%0A` +
+    `Estimated price: ₹${computePrice()}`;
+  document.getElementById('checkoutBtn').href = `https://wa.me/?text=${msg}`;
+
+  renderJar('mainJar');
+  renderJar('heroJar');
+}
+
+/* ---------------- BUILDER UI ---------------- */
+const tabbar = document.getElementById('tabbar');
+const panelsWrap = document.getElementById('panels');
+
+STEPS.forEach((step, idx)=>{
+  const tab = document.createElement('button');
+  tab.className = 'tab' + (idx===0 ? ' active' : '');
+  tab.innerHTML = `<span class="n">${idx+1}</span>${step.label}`;
+  tab.onclick = ()=> goToStep(idx);
+  tabbar.appendChild(tab);
+
+  const panel = document.createElement('div');
+  panel.className = 'panel' + (idx===0 ? ' active' : '');
+  panel.id = 'panel-' + idx;
+
+  if(step.key === 'name'){
+    panel.innerHTML = `
+      <h4>${step.title}</h4>
+      <div class="sub">${step.sub}</div>
+      <div class="name-input-wrap">
+        <input type="text" id="nameInput" maxlength="40" placeholder="e.g. The Midnight Craving" value="${state.name}">
+        <div class="name-examples">
+          <span>The Midnight Craving</span><span>Coffee Addict</span><span>My Wife Made Me Order This</span>
+        </div>
+      </div>
+      <div class="panel-nav">
+        <button id="prevBtn-${idx}">← Back</button>
+        <button class="primary" id="nextBtn-${idx}" disabled>Done ✓</button>
+      </div>`;
+  } else {
+    const optionsHTML = DATA[step.key].map(opt=>{
+      const isSel = step.multi ? state.toppings.includes(opt.k) : state[step.key]===opt.k;
+      return `<div class="opt-card ${step.multi?'multi':''} ${isSel?'sel':''}" data-key="${step.key}" data-val="${opt.k}">
+        <div class="swatch" style="background:${opt.color||'#ddd'}"></div>
+        <h5>${opt.n}</h5>
+        <div class="price-tag">${opt.price>0 ? '+₹'+opt.price : (idx===0?'from ₹'+opt.price:'included')}</div>
+      </div>`;
+    }).join('');
+    panel.innerHTML = `
+      <h4>${step.title}</h4>
+      <div class="sub">${step.sub}</div>
+      <div class="opt-grid">${optionsHTML}</div>
+      <div class="panel-nav">
+        <button id="prevBtn-${idx}" ${idx===0?'disabled':''}>← Back</button>
+        <button class="primary" id="nextBtn-${idx}">Continue →</button>
+      </div>`;
+  }
+  panelsWrap.appendChild(panel);
+});
+
+function goToStep(idx){
+  currentStep = idx;
+  document.querySelectorAll('.tab').forEach((t,i)=> t.classList.toggle('active', i===idx));
+  document.querySelectorAll('.panel').forEach((p,i)=> p.classList.toggle('active', i===idx));
+}
+
+STEPS.forEach((step, idx)=>{
+  const prevBtn = document.getElementById('prevBtn-'+idx);
+  const nextBtn = document.getElementById('nextBtn-'+idx);
+  if(prevBtn) prevBtn.onclick = ()=> goToStep(Math.max(0, idx-1));
+  if(nextBtn) nextBtn.onclick = ()=> goToStep(Math.min(STEPS.length-1, idx+1));
+});
+
+panelsWrap.addEventListener('click', (e)=>{
+  const card = e.target.closest('.opt-card');
+  if(!card) return;
+  const key = card.dataset.key, val = card.dataset.val;
+  const step = STEPS.find(s=>s.key===key);
+  if(step.multi){
+    const i = state.toppings.indexOf(val);
+    if(i>-1) state.toppings.splice(i,1); else state.toppings.push(val);
+  } else {
+    state[key] = val;
+  }
+  document.querySelectorAll(`.opt-card[data-key="${key}"]`).forEach(c=>{
+    const sel = step.multi ? state.toppings.includes(c.dataset.val) : state[key]===c.dataset.val;
+    c.classList.toggle('sel', sel);
+  });
+  updateSummary();
+});
+
+document.getElementById('nameInput').addEventListener('input', (e)=>{
+  state.name = e.target.value;
+  updateSummary();
+});
+
+document.querySelectorAll('.name-examples span').forEach(ex=>{
+  ex.onclick = ()=>{
+    state.name = ex.textContent;
+    document.getElementById('nameInput').value = state.name;
+    updateSummary();
+  };
+});
+
+/* ---------------- FEATURED CREATIONS (mini jars) ---------------- */
+const featured = [
+  {name:'Coffee Addict', crust:'oreo', base:'coffee', swirl:'caramel', toppings:['chocochip','dryfruit'], drizzle:'caramel', combo:'Coffee · Caramel · Oreo'},
+  {name:'The Midnight Craving', crust:'biscoff', base:'belgian', swirl:'peanut', toppings:['kitkat','chocochip'], drizzle:'chocolate', combo:'Chocolate · Peanut Butter · KitKat'},
+  {name:'Berry Bright', crust:'digestive', base:'vanilla', swirl:'strawberry', toppings:['sprinkles'], drizzle:'berry', combo:'Vanilla · Strawberry · Sprinkles'}
+];
+
+const grid = document.getElementById('creationsGrid');
+featured.forEach((f, i)=>{
+  const card = document.createElement('div');
+  card.className = 'creation-card';
+  const jarId = 'card-jar-' + i;
+  card.innerHTML = `<div class="jar-mini">${jarSVG(jarId, 130)}</div>
+    <div class="tagname">"${f.name}"</div>
+    <div class="combo">${f.combo}</div>`;
+  grid.appendChild(card);
+
+  // paint this jar to match its recipe
+  setTimeout(()=>{
+    const crust = DATA.crust.find(c=>c.k===f.crust);
+    const base = DATA.base.find(b=>b.k===f.base);
+    const swirl = DATA.swirl.find(s=>s.k===f.swirl);
+    const drizzle = DATA.drizzle.find(d=>d.k===f.drizzle);
+    document.getElementById(`layer-crust-${jarId}`).setAttribute('fill', crust.color);
+    document.getElementById(`layer-base-${jarId}`).setAttribute('fill', base.color);
+    document.getElementById(`layer-swirl-${jarId}`).setAttribute('fill', swirl.color);
+    document.getElementById(`layer-swirl-${jarId}`).setAttribute('opacity','0.85');
+    const topG = document.getElementById(`layer-toppings-${jarId}`);
+    const pos = toppingPositions(6);
+    let i2=0;
+    f.toppings.forEach(tk=>{
+      const t = DATA.topping.find(x=>x.k===tk);
+      for(let j=0;j<3 && i2<pos.length;j++,i2++){
+        const [x,y]=pos[i2];
+        const c = document.createElementNS('http://www.w3.org/2000/svg','circle');
+        c.setAttribute('cx', x); c.setAttribute('cy', y); c.setAttribute('r', 4.5); c.setAttribute('fill', t.color);
+        topG.appendChild(c);
+      }
+    });
+    if(drizzle.k !== 'none'){
+      const drizG = document.getElementById(`layer-drizzle-${jarId}`);
+      const pool = document.createElementNS('http://www.w3.org/2000/svg','ellipse');
+      pool.setAttribute('cx','120'); pool.setAttribute('cy','142'); pool.setAttribute('rx','62'); pool.setAttribute('ry','8');
+      pool.setAttribute('fill', drizzle.color);
+      drizG.appendChild(pool);
+      ['M75 140 Q73 165 76 190','M110 138 Q108 165 111 195','M150 138 Q148 160 151 185'].forEach(d=>{
+        const p = document.createElementNS('http://www.w3.org/2000/svg','path');
+        p.setAttribute('d', d); p.setAttribute('stroke', drizzle.color); p.setAttribute('stroke-width','6');
+        p.setAttribute('stroke-linecap','round'); p.setAttribute('fill','none');
+        drizG.appendChild(p);
+      });
+    }
+  }, 0);
+});
+
+updateSummary();
+</script>
 </body>
-
 </html>
