@@ -334,6 +334,16 @@
     background:var(--gold);color:var(--choc);box-shadow:none;
   }
   .checkout-btn:hover{background:var(--warm-white);}
+  .checkout-btn.disabled{opacity:0.45;pointer-events:none;}
+  .checkout-fields{margin-top:16px;display:flex;flex-direction:column;gap:8px;}
+  .checkout-fields input{
+    width:100%;background:rgba(255,253,251,0.08);border:1px solid rgba(255,253,251,0.18);
+    border-radius:10px;padding:10px 12px;font-size:13.5px;color:var(--warm-white);
+    font-family:'DM Sans',sans-serif;
+  }
+  .checkout-fields input::placeholder{color:rgba(255,253,251,0.45);}
+  .checkout-fields input:focus{outline:1.5px solid var(--gold);}
+  .checkout-warning{font-size:12.5px;color:#e0a8a8;text-align:center;margin-top:10px;min-height:16px;}
   .delivery-note{font-size:12px;color:rgba(255,253,251,0.5);text-align:center;margin-top:12px;}
 
   /* FOOTER */
@@ -486,7 +496,14 @@
         <div class="summary-row"><span>Drizzle</span><b id="sumDrizzle">—</b></div>
         <div class="summary-row" style="border-bottom:none;"><span>Delivery</span><b id="sumDelivery">Tomorrow +</b></div>
         <div class="summary-name" id="sumName">"Name your creation"</div>
+        <div class="checkout-fields">
+          <input type="text" id="custName" placeholder="Your name">
+          <input type="tel" id="custPhone" placeholder="Your WhatsApp number">
+          <input type="date" id="custDate">
+          <input type="text" id="custNotes" placeholder="Notes (optional) — allergies, timing, etc.">
+        </div>
         <a class="btn checkout-btn" id="checkoutBtn" target="_blank">Proceed to Checkout →</a>
+        <div class="checkout-warning" id="checkoutWarning"></div>
         <div class="delivery-note">Orders confirmed via WhatsApp · 24hr minimum notice</div>
       </div>
     </div>
@@ -556,8 +573,13 @@ const DATA = {
 
 const state = {
   size:'regular', crust:'digestive', base:'vanilla', swirl:'chocolate',
-  toppings:['oreocrumb'], drizzle:'chocolate', name:''
+  toppings:['oreocrumb'], drizzle:'chocolate', name:'',
+  customerName:'', phone:'', deliveryDate:'', notes:''
 };
+
+// Paste your deployed Apps Script Web app URL here to log orders straight to your Google Sheet.
+// Leave blank and checkout still works via WhatsApp only, nothing breaks.
+const SHEETS_ENDPOINT = "https://script.google.com/macros/s/AKfycbxvoC8NU-Dm9gCXzo0X7DxKWda_GTjL_jji5VsWEC_f3KGul6wCtHoF1kyEHCWAKu6Gfg/exec";
 
 const STEPS = [
   {key:'size', label:'Size', title:'Choose your size', sub:'How much cheesecake does this occasion need?', multi:false},
@@ -745,16 +767,23 @@ function updateSummary(){
     ? state.toppings.map(k=>DATA.topping.find(t=>t.k===k).n).join(', ')
     : '—';
   document.getElementById('sumDrizzle').textContent = DATA.drizzle.find(d=>d.k===state.drizzle).n;
+  document.getElementById('sumDelivery').textContent = state.deliveryDate
+    ? new Date(state.deliveryDate+'T00:00:00').toLocaleDateString('en-IN',{day:'numeric',month:'short'})
+    : 'Tomorrow +';
   document.getElementById('sumName').textContent = state.name ? `"${state.name}"` : '"Name your creation"';
 
   const msg = `Hi! I'd like to order a custom cheesecake:%0A` +
+    `Name: ${state.customerName || '—'}%0A` +
+    `WhatsApp: ${state.phone || '—'}%0A` +
+    `Delivery date: ${state.deliveryDate || '—'}%0A` +
     `Size: ${DATA.size.find(s=>s.k===state.size).n}%0A` +
     `Crust: ${DATA.crust.find(c=>c.k===state.crust).n}%0A` +
     `Base: ${DATA.base.find(b=>b.k===state.base).n}%0A` +
     `Swirl: ${DATA.swirl.find(s=>s.k===state.swirl).n}%0A` +
     `Toppings: ${state.toppings.map(k=>DATA.topping.find(t=>t.k===k).n).join(', ') || 'None'}%0A` +
     `Drizzle: ${DATA.drizzle.find(d=>d.k===state.drizzle).n}%0A` +
-    `Name: "${state.name || 'Untitled'}"%0A` +
+    `Cake name: "${state.name || 'Untitled'}"%0A` +
+    `Notes: ${state.notes || '—'}%0A` +
     `Estimated price: ₹${computePrice()}`;
   document.getElementById('checkoutBtn').href = `https://wa.me/?text=${msg}`;
 
@@ -864,6 +893,61 @@ document.querySelectorAll('.name-examples span').forEach(ex=>{
 });
 
 refreshDoneBtn();
+
+/* ---------------- CUSTOMER DETAILS + CHECKOUT SUBMIT ---------------- */
+const custNameEl = document.getElementById('custName');
+const custPhoneEl = document.getElementById('custPhone');
+const custDateEl = document.getElementById('custDate');
+const custNotesEl = document.getElementById('custNotes');
+const checkoutWarning = document.getElementById('checkoutWarning');
+
+// default delivery date to tomorrow, since orders need 24hr notice
+(function setDefaultDate(){
+  const tmrw = new Date();
+  tmrw.setDate(tmrw.getDate() + 1);
+  custDateEl.value = tmrw.toISOString().slice(0,10);
+  state.deliveryDate = custDateEl.value;
+})();
+
+custNameEl.addEventListener('input', e => { state.customerName = e.target.value; updateSummary(); });
+custPhoneEl.addEventListener('input', e => { state.phone = e.target.value; updateSummary(); });
+custDateEl.addEventListener('input', e => { state.deliveryDate = e.target.value; updateSummary(); });
+custNotesEl.addEventListener('input', e => { state.notes = e.target.value; updateSummary(); });
+
+document.getElementById('checkoutBtn').addEventListener('click', function(evt){
+  const missing = [];
+  if(!state.name || state.name.trim().length <= 3) missing.push('a name for your creation');
+  if(!state.customerName.trim()) missing.push('your name');
+  if(!state.phone.trim()) missing.push('your WhatsApp number');
+  if(!state.deliveryDate) missing.push('a delivery date');
+
+  if(missing.length){
+    evt.preventDefault();
+    checkoutWarning.textContent = 'Please add: ' + missing.join(', ');
+    return;
+  }
+  checkoutWarning.textContent = '';
+
+  if(SHEETS_ENDPOINT){
+    const payload = {
+      'Your name': state.customerName,
+      'WhatsApp number': state.phone,
+      'Preferred delivery date': state.deliveryDate,
+      'Size': DATA.size.find(s=>s.k===state.size).n,
+      'Crust': DATA.crust.find(c=>c.k===state.crust).n,
+      'Base': DATA.base.find(b=>b.k===state.base).n,
+      'Swirl': DATA.swirl.find(s=>s.k===state.swirl).n,
+      'Toppings': state.toppings.map(k=>DATA.topping.find(t=>t.k===k).n).join(', '),
+      'Drizzle': DATA.drizzle.find(d=>d.k===state.drizzle).n,
+      'Name your creation': state.name,
+      'Any notes': state.notes,
+      'Total Price': computePrice()
+    };
+    // sendBeacon survives the page navigating away to WhatsApp right after this click
+    navigator.sendBeacon(SHEETS_ENDPOINT, new Blob([JSON.stringify(payload)], {type:'text/plain'}));
+  }
+  // click continues naturally to the WhatsApp link already set on this <a>
+});
 
 /* ---------------- FEATURED CREATIONS (mini jars) ---------------- */
 const featured = [
